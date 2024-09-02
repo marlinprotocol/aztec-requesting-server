@@ -1,0 +1,17 @@
+{
+  "name": "aztec-requesting-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.21",
+    "express": "^4.19.2",
+    "kalypso-sdk": "^1.0.41",
+    "ts-node": "^10.9.2"
+  }
+}
