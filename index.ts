@@ -24,22 +24,35 @@ const abicoder = new ethers.AbiCoder();
 
 let globalNonce: number;
 app.post("/directProof", async (req: Request, res: Response) => {
-  const { method, inputs, type } = req.body as {
+  const { method, inputs } = req.body as {
     method: string;
     inputs: string;
-    type: string;
   };
-  const payload = JSON.stringify({ method, inputs, type });
+  const payload = JSON.stringify({ method, inputs });
   const input_da_identifier = await storeDataInMarlinDa(payload);
   console.log("************************");
-  console.warn(
-    "input_da_identifier",
-    input_da_identifier,
-    "payload size",
-    inputs.length,
-  );
+  console.warn("input_id", input_da_identifier);
+  console.warn("payload size", inputs.length);
   console.log("************************");
 
+  // let proof_id = await get_proof_via_kalypso(input_da_identifier);
+  let proof_id = await requestProof_directly(input_da_identifier);
+
+  console.log("#########################################");
+  console.warn("input_id", input_da_identifier, "proof_id", proof_id);
+  console.log("#########################################");
+
+  if (proof_id === "PROOF_NOT_FOUND") {
+    console.warn("Proof not found");
+    return res.status(400).json({ status: "Proof Not Found" });
+  }
+
+  return res.json({ proof_da_identifier: proof_id });
+});
+
+async function get_proof_via_kalypso(
+  input_da_identifier: string,
+): Promise<string> {
   const encoded = abicoder.encode(["string"], [input_da_identifier]);
 
   const askRequest = await kalypso.MarketPlace().createAsk(
@@ -59,16 +72,8 @@ app.post("/directProof", async (req: Request, res: Response) => {
 
   // fix timeouts and all cases here
   const proof_id = await getProofWithRetry(askId, tx!.blockNumber);
-  if (proof_id === "PROOF_NOT_FOUND") {
-    console.warn("Proof not found");
-    return res.status(400).json({ status: "Proof Not Found" });
-  }
-  console.log("#########################################");
-  console.log({ input_da_identifier, proof_identifier: proof_id });
-  console.log("#########################################");
-  return res.json({ proof_da_indentifier: proof_id });
-});
-
+  return proof_id;
+}
 app.get("/welcome", (req: Request, res: Response) => {
   res.send("Welcome to Aztec Requesting Service - GET!");
 });
@@ -77,41 +82,33 @@ app.post("/welcome", (req: Request, res: Response) => {
   res.send("Welcome to Aztec Requesting Service - POST!");
 });
 
-app.post("/convertToId", (req: Request, res: Response) => {
-  const body = req.body as { public: Uint8Array };
-  const encoded = Buffer.from(body.public);
-
-  try {
-    const id = abicoder.decode(["string"], encoded);
-    return res.json({ id: id[0] as string });
-  } catch (ex) {
-    return res.status(400).json({ status: "CANT DECODE" });
-  }
+app.listen(port, "0.0.0.0", () => {
+  console.warn(`Server is running on http://0.0.0.0:${port}`);
 });
 
-kalypso
-  .MarketPlace()
-  .approvePaymentTokenToMarketPlace("10000000000000000000000000000000000")
-  .then((tx) => {
-    tx.wait(40).then(() => {
-      app.listen(port, "0.0.0.0", () => {
-        console.warn(`Server is running on http://0.0.0.0:${port}`);
-        wallet.getAddress().then((address) => {
-          console.log("Using address: ", address);
-          provider.getTransactionCount(address).then((count) => {
-            console.log("transaction count", count);
-            globalNonce = count;
-          });
-        });
-        wallet.getNonce().then((nonce) => {
-          console.log("Wallet nonce:", nonce);
-        });
-      });
-    });
-  });
+// kalypso
+//   .MarketPlace()
+//   .approvePaymentTokenToMarketPlace("10000000000000000000000000000000000")
+//   .then((tx) => {
+//     tx.wait(40).then(() => {
+//       app.listen(port, "0.0.0.0", () => {
+//         console.warn(`Server is running on http://0.0.0.0:${port}`);
+//         wallet.getAddress().then((address) => {
+//           console.log("Using address: ", address);
+//           provider.getTransactionCount(address).then((count) => {
+//             console.log("transaction count", count);
+//             globalNonce = count;
+//           });
+//         });
+//         wallet.getNonce().then((nonce) => {
+//           console.log("Wallet nonce:", nonce);
+//         });
+//       });
+//     });
+//   });
 
 async function storeDataInMarlinDa(payload: string): Promise<string> {
-  const response = await fetch("http://136.243.2.119:8080/store", {
+  const response = await fetch("http://88.198.12.137:8080/store", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -125,6 +122,36 @@ async function storeDataInMarlinDa(payload: string): Promise<string> {
 
   const responseData: { id: string } = await response.json();
   return responseData.id;
+}
+
+async function requestProof_directly(
+  input_da_identifier: string,
+): Promise<string> {
+  const id_da_uint8_array = Array.from(
+    new Uint8Array(Buffer.from(input_da_identifier)),
+  );
+  const response = await fetch(
+    "http://machine_on_which_kalypso_delg_prover_is_running/api/getProof",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ public: id_da_uint8_array }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+
+  const responseData: { proof: Uint8Array } = await response.json();
+  return convertToId(responseData.proof);
+}
+
+function convertToId(publicUint8Array: Uint8Array): string {
+  const decodedString = Buffer.from(publicUint8Array).toString();
+  return decodedString;
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -162,21 +189,3 @@ async function getProofWithRetry(
     retries++;
   }
 }
-
-// async function fetchDataFromMarlinDa(id: string): Promise<string> {
-//   const response = await fetch(`http://136.243.2.119:8080/${id}`, {
-//     method: 'GET',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//   });
-
-//   if (!response.ok) {
-//     throw new Error(`HTTP error! Status: ${response.status}`);
-//   }
-
-//   const responseData: { payload: string } = await response.json();
-//   return responseData.payload;
-// }
-
-// getProofWithRetry("199", 3295850).then(console.log)
