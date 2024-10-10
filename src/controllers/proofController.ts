@@ -21,6 +21,7 @@ export const handleDirectProof = async (req: Request, res: Response) => {
       return res.status(400).json({ status: "Proof Not Found" });
     }
 
+    console.log({ method, input_da_identifier, proof_id });
     return res.json({ proof_da_identifier: proof_id });
   } catch (error) {
     console.error(error);
