@@ -24,30 +24,34 @@ const abicoder = new ethers.AbiCoder();
 
 let globalNonce: number;
 app.post("/directProof", async (req: Request, res: Response) => {
-  const { method, inputs } = req.body as {
-    method: string;
-    inputs: string;
-  };
-  const payload = JSON.stringify({ method, inputs });
-  const input_da_identifier = await storeDataInMarlinDa(payload);
-  console.log("************************");
-  console.warn("input_id", input_da_identifier);
-  console.warn("payload size", inputs.length);
-  console.log("************************");
-
-  // let proof_id = await get_proof_via_kalypso(input_da_identifier);
-  let proof_id = await requestProof_directly(input_da_identifier);
-
-  console.log("#########################################");
-  console.warn("input_id", input_da_identifier, "proof_id", proof_id);
-  console.log("#########################################");
-
-  if (proof_id === "PROOF_NOT_FOUND") {
-    console.warn("Proof not found");
-    return res.status(400).json({ status: "Proof Not Found" });
+  try {
+    const { method, inputs } = req.body as {
+      method: string;
+      inputs: string;
+    };
+    const payload = JSON.stringify({ method, inputs });
+    const input_da_identifier = await storeDataInMarlinDa(payload);
+    console.log("************************");
+    console.warn("input_id", input_da_identifier);
+    console.warn("payload size", inputs.length);
+    console.log("************************");
+  
+    // let proof_id = await get_proof_via_kalypso(input_da_identifier);
+    let proof_id = await requestProof_directly(input_da_identifier);
+  
+    console.log("#########################################");
+    console.warn("input_id", input_da_identifier, "proof_id", proof_id);
+    console.log("#########################################");
+  
+    if (proof_id === "PROOF_NOT_FOUND") {
+      console.warn("Proof not found");
+      return res.status(400).json({ status: "Proof Not Found" });
+    }
+  
+    return res.json({ proof_da_identifier: proof_id }); 
+  } catch (error) {
+    res.status(501).send("Something wrong with server");
   }
-
-  return res.json({ proof_da_identifier: proof_id });
 });
 
 async function get_proof_via_kalypso(
