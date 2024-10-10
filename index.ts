@@ -22,6 +22,10 @@ const proofGenerationTimeInBlocks = new BigNumber(0).plus(100000000000000);
 
 const abicoder = new ethers.AbiCoder();
 
+storeDataInMarlinDa("Test Payload").then(function (uuid) {
+  console.log("Stored Test data successfully with id", uuid);
+});
+
 let globalNonce: number;
 app.post("/directProof", async (req: Request, res: Response) => {
   try {
@@ -35,20 +39,20 @@ app.post("/directProof", async (req: Request, res: Response) => {
     console.warn("input_id", input_da_identifier);
     console.warn("payload size", inputs.length);
     console.log("************************");
-  
+
     // let proof_id = await get_proof_via_kalypso(input_da_identifier);
     let proof_id = await requestProof_directly(input_da_identifier);
-  
+
     console.log("#########################################");
     console.warn("input_id", input_da_identifier, "proof_id", proof_id);
     console.log("#########################################");
-  
+
     if (proof_id === "PROOF_NOT_FOUND") {
       console.warn("Proof not found");
       return res.status(400).json({ status: "Proof Not Found" });
     }
-  
-    return res.json({ proof_da_identifier: proof_id }); 
+
+    return res.json({ proof_da_identifier: proof_id });
   } catch (error) {
     console.error(error);
     res.status(501).send("Something wrong with server");
