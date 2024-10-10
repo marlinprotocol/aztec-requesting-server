@@ -28,7 +28,7 @@
       "url": "http://not-deployyed:5000",
       "utilityUrl": "http://not-deployed:1500"
     },
-    "checkInputUrl": "not-requitred",
+    "checkInputUrl": "not-required",
     "attestationVerifierEndPoint": "http://13.201.207.60:1400"
   },
   "retryInterval": 1000,
@@ -39,6 +39,6 @@
   "assignmentDeadline": "100000000000000",
   "proofGenerationTimeInBlocks": "100000000000000",
   "enableKalypso": true,
-  "onchainConfirmation": 5,
+  "onchainConfirmation": 12,
   "kalypsoMarketId": "8"
 }

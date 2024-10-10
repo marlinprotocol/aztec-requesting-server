@@ -39,12 +39,11 @@ export async function getProofViaKalypso(
 ): Promise<string> {
   await transactionSemaphore.acquire();
   try {
-    const abicoder = new ethers.AbiCoder();
-    const encoded = abicoder.encode(["string"], [input_da_identifier]);
+    const encodedInput = Buffer.from(input_da_identifier);
 
     const askRequest = await kalypso.MarketPlace().createAsk(
       config.kalypsoMarketId,
-      encoded,
+      encodedInput,
       reward.toFixed(0),
       assignmentDeadline.toFixed(0),
       proofGenerationTimeInBlocks.toFixed(0),
