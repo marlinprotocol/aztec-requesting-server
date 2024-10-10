@@ -12,7 +12,7 @@
     "@types/express": "^4.17.21",
     "async-mutex": "^0.5.0",
     "express": "^4.19.2",
-    "kalypso-sdk": "^1.0.41",
+    "kalypso-sdk": "^1.0.45",
     "ts-node": "^10.9.2"
   }
 }
