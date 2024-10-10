@@ -64,6 +64,13 @@ export async function getProofViaKalypso(
   }
 }
 
+export async function getAskIdFromTxHash(hash: string): Promise<string> {
+  const receipt = await provider.getTransactionReceipt(hash);
+  const askId = await kalypso.MarketPlace().getAskId(receipt!);
+  console.log("Ask ID:", askId);
+  return "Done";
+}
+
 async function getProofWithRetry(
   askId: string,
   startBlock: number,

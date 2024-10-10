@@ -2,6 +2,7 @@ import express from "express";
 import routes from "./routes";
 import { errorHandler } from "./utils/errorUtils";
 import {
+  getAskIdFromTxHash,
   initializeNonce,
   setInfiniteApproval,
 } from "./services/kalypsoService";
@@ -30,15 +31,19 @@ function startServer() {
   });
 }
 
-if (config.kalypsoConfig) {
-  initializeNonce().then(console.log);
-  setInfiniteApproval().then((hash) => {
-    console.log("set infinite approval");
-    console.log(hash);
-    startServer();
-  });
-} else {
-  startServer();
-}
+// if (config.kalypsoConfig) {
+//   initializeNonce().then(console.log);
+//   setInfiniteApproval().then((hash) => {
+//     console.log("set infinite approval");
+//     console.log(hash);
+//     startServer();
+//   });
+// } else {
+//   startServer();
+// }
+
+getAskIdFromTxHash(
+  "0xa052a3a0071d5c584098baced7e8cfc944857ec3ecaeb6e18634965f1753e770",
+).then(console.log);
 
 export default app;
