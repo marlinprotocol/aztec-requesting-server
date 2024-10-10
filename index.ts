@@ -50,6 +50,7 @@ app.post("/directProof", async (req: Request, res: Response) => {
   
     return res.json({ proof_da_identifier: proof_id }); 
   } catch (error) {
+    console.error(error);
     res.status(501).send("Something wrong with server");
   }
 });
