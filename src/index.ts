@@ -31,16 +31,16 @@ function startServer() {
   });
 }
 
-// if (config.kalypsoConfig) {
-//   initializeNonce().then(console.log);
-//   setInfiniteApproval().then((hash) => {
-//     console.log("set infinite approval");
-//     console.log(hash);
-//     startServer();
-//   });
-// } else {
-//   startServer();
-// }
+if (config.kalypsoConfig) {
+  initializeNonce().then(console.log);
+  setInfiniteApproval().then((hash) => {
+    console.log("set infinite approval");
+    console.log(hash);
+    startServer();
+  });
+} else {
+  startServer();
+}
 
 getAskIdFromTxHash(
   "0xa052a3a0071d5c584098baced7e8cfc944857ec3ecaeb6e18634965f1753e770",
