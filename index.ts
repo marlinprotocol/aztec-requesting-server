@@ -140,7 +140,7 @@ async function requestProof_directly(
     new Uint8Array(Buffer.from(input_da_identifier)),
   );
   const response = await fetch(
-    "http://machine_on_which_kalypso_delg_prover_is_running/api/getProof",
+    "http://3.110.126.236:7777/api/getProof",
     {
       method: "POST",
       headers: {
