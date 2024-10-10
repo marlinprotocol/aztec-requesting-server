@@ -37,5 +37,6 @@
   "proofServiceUrl": "http://3.110.126.236:7777/api/getProof",
   "reward": "145000000000000000000",
   "assignmentDeadline": "100000000000000",
-  "proofGenerationTimeInBlocks": "100000000000000"
+  "proofGenerationTimeInBlocks": "100000000000000",
+  "enableKalypso": false
 }

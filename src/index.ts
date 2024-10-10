@@ -19,10 +19,12 @@ app.use(errorHandler);
 // Start server
 app.listen(port, "0.0.0.0", async () => {
   console.log(`Server is running on http://0.0.0.0:${port}`);
-  // await initializeNonce(); // init nonce if kalypso prover is used in routes, else  comment it out for now
   storeDataInMarlinDa("Test Data IN DA").then((uuid: string) => {
     console.log("Stored data in da with ID:", uuid);
   });
+  if (config.enableKalypso) {
+    initializeNonce().then(console.log);
+  }
 });
 
 export default app;

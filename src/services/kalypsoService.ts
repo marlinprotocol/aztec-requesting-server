@@ -17,10 +17,11 @@ const proofGenerationTimeInBlocks = new BigNumber(
 
 let globalNonce: number;
 
-export async function initializeNonce() {
+export async function initializeNonce(): Promise<string> {
   const address = await wallet.getAddress();
-  globalNonce = await provider.getTransactionCount(address);
-  console.log("Initialized global nonce:", globalNonce);
+  let nonce = await provider.getTransactionCount(address);
+  globalNonce = nonce;
+  return "Initialized global nonce:" + globalNonce;
 }
 
 export async function getProofViaKalypso(
