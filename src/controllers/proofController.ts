@@ -3,6 +3,7 @@ import { storeDataInMarlinDa } from "../services/marlinDaService";
 import { requestProofDirectly } from "../services/proofServices";
 import config from "../config.json";
 import { getProofViaKalypso } from "../services/kalypsoService";
+
 export const handleDirectProof = async (req: Request, res: Response) => {
   try {
     const { method, inputs } = req.body as { method: string; inputs: string };
@@ -23,6 +24,6 @@ export const handleDirectProof = async (req: Request, res: Response) => {
     return res.json({ proof_da_identifier: proof_id });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Something went wrong with the server");
+    return res.status(500).send("Something went wrong with the server");
   }
 };
