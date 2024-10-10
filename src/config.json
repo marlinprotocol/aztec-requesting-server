@@ -1,7 +1,7 @@
 {
   "port": 9001,
   "rpcUrl": "https://arb-sepolia.g.alchemy.com/v2/cFwacd_RbVpNrezyxZEvO6AnnCuO-kxt",
-  "requestorGasKey":"0x0cd323c3b0c75b945633180f08063a3af5287383493d587628ee8709d0c4224d",
+  "requestorGasKey": "0x0cd323c3b0c75b945633180f08063a3af5287383493d587628ee8709d0c4224d",
   "kalypsoConfig": {
     "payment_token": "0x01d84D33CC8636F83d2bb771e184cE57d8356863",
     "staking_token": "0xdb69299dDE4A00c99b885D9f8748B2AeD1Fe4Ed4",

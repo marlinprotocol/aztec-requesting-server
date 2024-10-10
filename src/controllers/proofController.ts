@@ -31,5 +31,21 @@ export const handleDirectProof = async (req: Request, res: Response) => {
 };
 
 const isSupportedProofTypeOnKalypso = (proofType: string): boolean => {
-  return ["BASE_PARITY_PROOF"].includes(proofType);
+  return [
+    "BASE_PARITY_PROOF",
+    "ROOT_PARITY_PROOF",
+    "BASE_ROLLUP_PROOF",
+    "TUBE_PROOF",
+    "MERGE_ROLLUP_PROOF",
+    "BLOCK_ROOT_ROLLUP_PROOF",
+    "BLOCK_ROOT_ROLLUP_FINAL_PROOF",
+    "BLOCK_MERGE_ROLLUP_PROOF",
+    "ROOT_ROLLUP_PROOF",
+    "PUBLIC_KERNEL_INNER_PROOF",
+    "PUBLIC_KERNEL_MERGE_PROOF",
+    "PUBLIC_TAIL_PROOF",
+    "EMPTY_PRIVATE_KERNEL_PROOF",
+    "EMPTY_TUBE_PROOF",
+    "AVM_PROOF"
+  ].includes(proofType);
 };
