@@ -4,6 +4,7 @@ import config from "../config.json";
 import BigNumber from "bignumber.js";
 import { sleep } from "../utils/sleep";
 import requestData from "../../requestData.json";
+import { Semaphore } from "async-mutex";
 
 const provider = new ethers.JsonRpcProvider(config.rpcUrl);
 const wallet = new ethers.Wallet(config.requestorGasKey, provider);
@@ -14,6 +15,8 @@ const assignmentDeadline = new BigNumber(config.assignmentDeadline);
 const proofGenerationTimeInBlocks = new BigNumber(
   config.proofGenerationTimeInBlocks,
 );
+
+const transactionSemaphore = new Semaphore(1);
 
 let globalNonce: number;
 
@@ -35,26 +38,32 @@ export async function setInfiniteApproval(): Promise<string> {
 export async function getProofViaKalypso(
   input_da_identifier: string,
 ): Promise<string> {
-  const abicoder = new ethers.AbiCoder();
-  const encoded = abicoder.encode(["string"], [input_da_identifier]);
+  await transactionSemaphore.acquire();
+  try {
+    const abicoder = new ethers.AbiCoder();
+    const encoded = abicoder.encode(["string"], [input_da_identifier]);
 
-  const askRequest = await kalypso.MarketPlace().createAsk(
-    requestData.marketId,
-    encoded,
-    reward.toFixed(0),
-    assignmentDeadline.toFixed(0),
-    proofGenerationTimeInBlocks.toFixed(0),
-    await wallet.getAddress(),
-    0, // Keep this 0 for now
-    Buffer.from(""),
-    false,
-    { nonce: globalNonce++ },
-  );
+    const askRequest = await kalypso.MarketPlace().createAsk(
+      requestData.marketId,
+      encoded,
+      reward.toFixed(0),
+      assignmentDeadline.toFixed(0),
+      proofGenerationTimeInBlocks.toFixed(0),
+      await wallet.getAddress(),
+      0, // Keep this 0 for now
+      Buffer.from(""),
+      false,
+    );
+    transactionSemaphore.release();
 
-  const tx = await askRequest.wait(config.onchainConfirmation);
-  const askId = await kalypso.MarketPlace().getAskId(tx!);
+    const tx = await askRequest.wait(config.onchainConfirmation);
+    const askId = await kalypso.MarketPlace().getAskId(tx!);
 
-  return await getProofWithRetry(askId, tx!.blockNumber);
+    return await getProofWithRetry(askId, tx!.blockNumber);
+  } catch (error) {
+    transactionSemaphore.release();
+    throw error;
+  }
 }
 
 async function getProofWithRetry(
