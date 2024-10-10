@@ -12,9 +12,10 @@ export const handleDirectProof = async (req: Request, res: Response) => {
 
     console.log("Stored data successfully with id", input_da_identifier);
 
-    const proof_id = config.enableKalypso && isSupportedProofTypeOnKalypso(method)
-      ? await getProofViaKalypso(input_da_identifier)
-      : await requestProofDirectly(input_da_identifier);
+    const proof_id =
+      config.enableKalypso && isSupportedProofTypeOnKalypso(method)
+        ? await getProofViaKalypso(input_da_identifier)
+        : await requestProofDirectly(input_da_identifier);
 
     if (proof_id === "PROOF_NOT_FOUND") {
       console.warn("Proof not found");
@@ -29,6 +30,6 @@ export const handleDirectProof = async (req: Request, res: Response) => {
   }
 };
 
-const isSupportedProofTypeOnKalypso = (proofType: string): boolean  => {
-  return ["BASE_PARITY_PROOF"].includes(proofType)
-}
+const isSupportedProofTypeOnKalypso = (proofType: string): boolean => {
+  return ["BASE_PARITY_PROOF"].includes(proofType);
+};

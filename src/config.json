@@ -38,5 +38,6 @@
   "reward": "145000000000000000000",
   "assignmentDeadline": "100000000000000",
   "proofGenerationTimeInBlocks": "100000000000000",
-  "enableKalypso": true
+  "enableKalypso": true,
+  "onchainConfirmation": 5
 }

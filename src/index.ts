@@ -1,7 +1,10 @@
 import express from "express";
 import routes from "./routes";
 import { errorHandler } from "./utils/errorUtils";
-import { initializeNonce } from "./services/kalypsoService";
+import {
+  initializeNonce,
+  setInfiniteApproval,
+} from "./services/kalypsoService";
 import config from "./config.json";
 import { storeDataInMarlinDa } from "./services/marlinDaService";
 
@@ -17,14 +20,25 @@ app.use("/", routes);
 app.use(errorHandler);
 
 // Start server
-app.listen(port, "0.0.0.0", async () => {
-  console.log(`Server is running on http://0.0.0.0:${port}`);
+
+function startServer() {
   storeDataInMarlinDa("Test Data IN DA").then((uuid: string) => {
     console.log("Stored data in da with ID:", uuid);
+    app.listen(port, "0.0.0.0", async () => {
+      console.log(`Server is running on http://0.0.0.0:${port}`);
+    });
   });
-  if (config.enableKalypso) {
-    initializeNonce().then(console.log);
-  }
-});
+}
+
+if (config.kalypsoConfig) {
+  initializeNonce().then(console.log);
+  setInfiniteApproval().then((hash) => {
+    console.log("set infinite approval");
+    console.log(hash);
+    startServer();
+  });
+} else {
+  startServer();
+}
 
 export default app;

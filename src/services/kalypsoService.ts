@@ -24,6 +24,14 @@ export async function initializeNonce(): Promise<string> {
   return "Initialized global nonce:" + globalNonce;
 }
 
+export async function setInfiniteApproval(): Promise<string> {
+  const tx = await kalypso
+    .MarketPlace()
+    .approvePaymentTokenToMarketPlace("999999999999999999999999999999999999");
+  const receipt = await tx.wait(config.onchainConfirmation);
+  return receipt!.hash;
+}
+
 export async function getProofViaKalypso(
   input_da_identifier: string,
 ): Promise<string> {
@@ -43,7 +51,7 @@ export async function getProofViaKalypso(
     { nonce: globalNonce++ },
   );
 
-  const tx = await askRequest.wait();
+  const tx = await askRequest.wait(config.onchainConfirmation);
   const askId = await kalypso.MarketPlace().getAskId(tx!);
 
   return await getProofWithRetry(askId, tx!.blockNumber);
