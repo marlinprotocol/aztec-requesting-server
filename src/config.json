@@ -39,5 +39,6 @@
   "assignmentDeadline": "100000000000000",
   "proofGenerationTimeInBlocks": "100000000000000",
   "enableKalypso": true,
-  "onchainConfirmation": 5
+  "onchainConfirmation": 5,
+  "kalypsoMarketId": "8"
 }

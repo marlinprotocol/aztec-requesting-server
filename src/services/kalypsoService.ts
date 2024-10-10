@@ -3,7 +3,6 @@ import { ethers } from "ethers";
 import config from "../config.json";
 import BigNumber from "bignumber.js";
 import { sleep } from "../utils/sleep";
-import requestData from "../../requestData.json";
 import { Semaphore } from "async-mutex";
 
 const provider = new ethers.JsonRpcProvider(config.rpcUrl);
@@ -44,7 +43,7 @@ export async function getProofViaKalypso(
     const encoded = abicoder.encode(["string"], [input_da_identifier]);
 
     const askRequest = await kalypso.MarketPlace().createAsk(
-      requestData.marketId,
+      config.kalypsoMarketId,
       encoded,
       reward.toFixed(0),
       assignmentDeadline.toFixed(0),
